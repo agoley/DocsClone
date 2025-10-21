@@ -27,7 +27,7 @@ const DocumentEditor = () => {
       console.log("Current URL:", window.location.href);
       setLoading(true);
       setError(null); // Clear any previous errors
-      
+
       const data = await documentsApi.getDocumentById(id);
       console.log("Document fetched successfully:", data);
       setDocument(data);
@@ -42,10 +42,12 @@ const DocumentEditor = () => {
         statusText: err.response?.statusText,
         data: err.response?.data,
       });
-      
+
       // Don't redirect automatically, just show the error
       setError(
-        `Failed to load document ID ${id}. ${err.response?.data?.error || err.message}`,
+        `Failed to load document ID ${id}. ${
+          err.response?.data?.error || err.message
+        }`,
       );
     } finally {
       setLoading(false);

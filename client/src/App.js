@@ -4,32 +4,36 @@ import DocumentList from "./pages/DocumentList";
 import DocumentEditor from "./pages/DocumentEditor";
 import SharedDocument from "./pages/SharedDocument";
 import ApiDebugger from "./components/ApiDebugger";
+import RouteHandler from "./components/RouteHandler";
 
 function App() {
   return (
     <div className="App">
-      <Routes>
-        <Route path="/" element={<DocumentList />} />
-        <Route path="/documents/:id" element={<DocumentEditor />} />
-        <Route path="/shared/:shareId" element={<SharedDocument />} />
-        <Route path="/debug" element={<ApiDebugger />} />
-        <Route
-          path="*"
-          element={
-            <div className="docs-404">
-              <h2>404 - Page Not Found</h2>
-              <p>Current URL: {window.location.pathname}</p>
-              <p>Available routes:</p>
-              <ul>
-                <li>/</li>
-                <li>/documents/:id</li>
-                <li>/shared/:shareId</li>
-                <li>/debug</li>
-              </ul>
-            </div>
-          }
-        />
-      </Routes>
+      <RouteHandler>
+        <Routes>
+          <Route path="/" element={<DocumentList />} />
+          <Route path="/index.html" element={<DocumentList />} />
+          <Route path="/documents/:id" element={<DocumentEditor />} />
+          <Route path="/shared/:shareId" element={<SharedDocument />} />
+          <Route path="/debug" element={<ApiDebugger />} />
+          <Route
+            path="*"
+            element={
+              <div className="docs-404">
+                <h2>404 - Page Not Found</h2>
+                <p>Current URL: {window.location.pathname}</p>
+                <p>Available routes:</p>
+                <ul>
+                  <li>/</li>
+                  <li>/documents/:id</li>
+                  <li>/shared/:shareId</li>
+                  <li>/debug</li>
+                </ul>
+              </div>
+            }
+          />
+        </Routes>
+      </RouteHandler>
     </div>
   );
 }
