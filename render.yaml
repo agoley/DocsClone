@@ -36,3 +36,6 @@ services:
       - path: /*
         name: Cache-Control
         value: no-store
+    rewrites:
+      - source: "/*"
+        destination: "/index.html"
