@@ -64,9 +64,9 @@ const DocumentList = () => {
           <span className="docs-icon">📝</span>
           <span className="docs-title">Docs</span>
         </div>
-        
-        <button 
-          className="docs-new-doc-btn" 
+
+        <button
+          className="docs-new-doc-btn"
           onClick={() => setShowNewDocForm(!showNewDocForm)}
         >
           {showNewDocForm ? "Cancel" : "+ Blank document"}
@@ -101,7 +101,7 @@ const DocumentList = () => {
                   <div className="docs-card-preview">
                     <div className="docs-card-icon">📄</div>
                   </div>
-                  
+
                   <div className="docs-card-info">
                     <h3 className="docs-card-title">{doc.title}</h3>
                     <div className="docs-card-meta">
@@ -110,14 +110,13 @@ const DocumentList = () => {
                         <span>You</span>
                       </div>
                       <div className="docs-card-date">
-                        {doc.updated_at && doc.updated_at !== doc.created_at 
+                        {doc.updated_at && doc.updated_at !== doc.created_at
                           ? `Opened ${formatDate(doc.updated_at)}`
-                          : `Created ${formatDate(doc.created_at)}`
-                        }
+                          : `Created ${formatDate(doc.created_at)}`}
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="docs-card-menu">
                     <button className="docs-menu-btn">⋮</button>
                   </div>
@@ -130,7 +129,7 @@ const DocumentList = () => {
             <div className="empty-state-icon">📄</div>
             <h3>No documents yet</h3>
             <p>Create your first document to get started!</p>
-            <button 
+            <button
               className="docs-create-btn"
               onClick={() => setShowNewDocForm(true)}
             >

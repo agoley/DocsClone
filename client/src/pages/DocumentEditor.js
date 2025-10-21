@@ -24,14 +24,16 @@ const DocumentEditor = () => {
   const fetchDocument = useCallback(async () => {
     try {
       console.log("Fetching document with ID:", id);
+      console.log("Current URL:", window.location.href);
       setLoading(true);
+      setError(null); // Clear any previous errors
+      
       const data = await documentsApi.getDocumentById(id);
       console.log("Document fetched successfully:", data);
       setDocument(data);
       setTitle(data.title);
       setContent(data.content);
       lastSavedContent.current = { title: data.title, content: data.content };
-      setError(null);
     } catch (err) {
       console.error("Error fetching document:", err);
       console.error("Error details:", {
@@ -40,8 +42,10 @@ const DocumentEditor = () => {
         statusText: err.response?.statusText,
         data: err.response?.data,
       });
+      
+      // Don't redirect automatically, just show the error
       setError(
-        `Failed to load document. ${err.response?.data?.error || err.message}`,
+        `Failed to load document ID ${id}. ${err.response?.data?.error || err.message}`,
       );
     } finally {
       setLoading(false);
@@ -221,9 +225,28 @@ const DocumentEditor = () => {
 
   if (error) {
     return (
-      <div className="card">
-        <p>{error}</p>
-        <button onClick={() => navigate("/")}>Back to Documents</button>
+      <div className="docs-container">
+        <div className="docs-header">
+          <div className="docs-header-left">
+            <div className="docs-logo">
+              <span className="docs-icon">📝</span>
+              <span className="docs-title">Docs</span>
+            </div>
+          </div>
+          <div className="docs-header-right">
+            <button className="menu-btn" onClick={() => navigate("/")}>
+              ←
+            </button>
+          </div>
+        </div>
+        <div className="docs-error">
+          <h2>Error Loading Document</h2>
+          <p>{error}</p>
+          <div className="error-actions">
+            <button onClick={fetchDocument}>Try Again</button>
+            <button onClick={() => navigate("/")}>Back to Documents</button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -241,7 +264,7 @@ const DocumentEditor = () => {
             <span className="docs-icon">📝</span>
             <span className="docs-title">Docs</span>
           </div>
-          
+
           <div className="docs-document-info">
             <input
               type="text"
@@ -250,7 +273,7 @@ const DocumentEditor = () => {
               placeholder="Untitled document"
               className="docs-title-input"
             />
-            
+
             <div className="docs-save-status">
               {isSaving ? (
                 <span className="saving">
@@ -270,11 +293,11 @@ const DocumentEditor = () => {
               <span className="user-count">{activeUsers}</span>
             </div>
           )}
-          
+
           <button className="docs-share-btn" onClick={handleShare}>
             Share
           </button>
-          
+
           <div className="docs-menu">
             <button className="menu-btn" onClick={() => navigate("/")}>
               ←
@@ -293,19 +316,29 @@ const DocumentEditor = () => {
             <option>11</option>
           </select>
         </div>
-        
+
         <div className="toolbar-divider"></div>
-        
+
         <div className="toolbar-section">
-          <button className="toolbar-btn" title="Bold">B</button>
-          <button className="toolbar-btn" title="Italic">I</button>
-          <button className="toolbar-btn" title="Underline">U</button>
+          <button className="toolbar-btn" title="Bold">
+            B
+          </button>
+          <button className="toolbar-btn" title="Italic">
+            I
+          </button>
+          <button className="toolbar-btn" title="Underline">
+            U
+          </button>
         </div>
-        
+
         <div className="toolbar-divider"></div>
-        
+
         <div className="toolbar-section">
-          <button className="toolbar-btn danger" onClick={handleDelete} title="Delete document">
+          <button
+            className="toolbar-btn danger"
+            onClick={handleDelete}
+            title="Delete document"
+          >
             🗑️
           </button>
         </div>

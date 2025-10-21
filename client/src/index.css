@@ -1,8 +1,8 @@
 body {
   margin: 0;
-  font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "Google Sans", Roboto, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f9fbff;
@@ -19,7 +19,7 @@ body {
   margin: 40px auto;
   max-width: 600px;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(60,64,67,0.3);
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3);
 }
 
 code {
@@ -176,7 +176,7 @@ textarea {
 .docs-container {
   min-height: 100vh;
   background-color: #f9fbff;
-  font-family: 'Google Sans', Roboto, Arial, sans-serif;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
 }
 
 .docs-header {
@@ -234,7 +234,7 @@ textarea {
 
 .docs-title-input:focus {
   background-color: #fff;
-  box-shadow: 0 1px 2px rgba(60,64,67,0.3);
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3);
 }
 
 .docs-save-status {
@@ -261,8 +261,12 @@ textarea {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .saved {
@@ -396,7 +400,7 @@ textarea {
   width: 8.5in;
   min-height: 11in;
   background-color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
   padding: 1in;
   margin: 0 auto;
 }
@@ -407,7 +411,7 @@ textarea {
   min-height: 9in;
   border: none;
   outline: none;
-  font-family: 'Times New Roman', serif;
+  font-family: "Times New Roman", serif;
   font-size: 11pt;
   line-height: 1.15;
   color: #202124;
@@ -449,7 +453,7 @@ textarea {
 .docs-home {
   min-height: 100vh;
   background-color: #f9fbff;
-  font-family: 'Google Sans', Roboto, Arial, sans-serif;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
 }
 
 .docs-home-header {
@@ -491,7 +495,7 @@ textarea {
   margin: 16px 24px;
   padding: 24px;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(60,64,67,0.3);
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3);
 }
 
 .docs-content {
@@ -532,7 +536,8 @@ textarea {
 }
 
 .docs-document-card:hover {
-  box-shadow: 0 1px 3px rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3),
+    0 4px 8px 3px rgba(60, 64, 67, 0.15);
   transform: translateY(-1px);
 }
 
@@ -657,6 +662,48 @@ textarea {
   background-color: #1557b0;
 }
 
+/* Error State Styles */
+.docs-error {
+  padding: 40px 24px;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.docs-error h2 {
+  color: #d93025;
+  margin-bottom: 16px;
+  font-weight: 400;
+}
+
+.docs-error p {
+  color: #5f6368;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.error-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.error-actions button {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.error-actions button:hover {
+  background-color: #1557b0;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .docs-page {
@@ -665,33 +712,33 @@ textarea {
     box-shadow: none;
     padding: 16px;
   }
-  
+
   .docs-header {
     padding: 8px 16px;
   }
-  
+
   .docs-toolbar {
     padding: 8px 16px;
     overflow-x: auto;
   }
-  
+
   .docs-title-input {
     min-width: 150px;
   }
-  
+
   .docs-home-header {
     padding: 12px 16px;
   }
-  
+
   .docs-content {
     padding: 16px;
   }
-  
+
   .docs-grid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 12px;
   }
-  
+
   .docs-new-form {
     margin: 12px 16px;
     padding: 16px;
