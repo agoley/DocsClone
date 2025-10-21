@@ -400,29 +400,62 @@ textarea {
   width: 8.5in;
   min-height: 11in;
   background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1);
   padding: 1in;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
-.docs-textarea {
-  width: 100%;
+/* Rich Text Editor Styles */
+.rich-text-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   min-height: 9in;
-  border: none;
-  outline: none;
-  font-family: "Times New Roman", serif;
-  font-size: 11pt;
-  line-height: 1.15;
-  color: #202124;
-  resize: none;
-  background: transparent;
 }
 
-.docs-textarea::placeholder {
+.rich-text-editor .ql-toolbar {
+  border: none;
+  border-bottom: 1px solid #dadce0;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.rich-text-editor .ql-container {
+  border: none;
+  flex: 1;
+  font-family: 'Times New Roman', serif;
+  font-size: 11pt;
+  line-height: 1.15;
+}
+
+.rich-text-editor .ql-editor {
+  padding: 0;
+  min-height: 8in;
+  color: #202124;
+}
+
+.rich-text-editor .ql-editor.ql-blank::before {
   color: #9aa0a6;
   font-style: italic;
 }
+
+/* Quill Snow Theme Customizations */
+.ql-snow .ql-toolbar button:hover,
+.ql-snow .ql-toolbar button:focus {
+  color: #1a73e8;
+}
+
+.ql-snow .ql-toolbar button.ql-active {
+  color: #1a73e8;
+}
+
+
 
 .docs-toast {
   position: fixed;

@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const RouteHandler = ({ children }) => {
   const navigate = useNavigate();
@@ -7,8 +7,8 @@ const RouteHandler = ({ children }) => {
 
   useEffect(() => {
     // If we're on /index.html, redirect to home
-    if (location.pathname === '/index.html') {
-      navigate('/', { replace: true });
+    if (location.pathname === "/index.html") {
+      navigate("/", { replace: true });
     }
   }, [location, navigate]);
 

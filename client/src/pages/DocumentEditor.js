@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { documentsApi } from "../services/api";
 import wsService from "../services/websocket";
 import ShareModal from "../components/ShareModal";
+import RichTextEditor from "../components/RichTextEditor";
 
 const DocumentEditor = () => {
   const { id } = useParams();
@@ -308,40 +309,15 @@ const DocumentEditor = () => {
         </div>
       </div>
 
-      {/* Google Docs-style Toolbar */}
+      {/* Document Actions Toolbar */}
       <div className="docs-toolbar">
-        <div className="toolbar-section">
-          <select className="font-family">
-            <option>Arial</option>
-          </select>
-          <select className="font-size">
-            <option>11</option>
-          </select>
-        </div>
-
-        <div className="toolbar-divider"></div>
-
-        <div className="toolbar-section">
-          <button className="toolbar-btn" title="Bold">
-            B
-          </button>
-          <button className="toolbar-btn" title="Italic">
-            I
-          </button>
-          <button className="toolbar-btn" title="Underline">
-            U
-          </button>
-        </div>
-
-        <div className="toolbar-divider"></div>
-
         <div className="toolbar-section">
           <button
             className="toolbar-btn danger"
             onClick={handleDelete}
             title="Delete document"
           >
-            🗑️
+            🗑️ Delete
           </button>
         </div>
       </div>
@@ -349,11 +325,10 @@ const DocumentEditor = () => {
       {/* Google Docs-style Document */}
       <div className="docs-editor-container">
         <div className="docs-page">
-          <textarea
+          <RichTextEditor
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={setContent}
             placeholder="Start typing your document..."
-            className="docs-textarea"
           />
         </div>
       </div>
