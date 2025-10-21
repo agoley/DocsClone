@@ -400,7 +400,7 @@ textarea {
   width: 8.5in;
   min-height: 11in;
   background-color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
   padding: 1in;
   margin: 0 auto;
   display: flex;
@@ -429,7 +429,7 @@ textarea {
 .rich-text-editor .ql-container {
   border: none;
   flex: 1;
-  font-family: 'Times New Roman', serif;
+  font-family: "Times New Roman", serif;
   font-size: 11pt;
   line-height: 1.15;
 }
@@ -454,8 +454,6 @@ textarea {
 .ql-snow .ql-toolbar button.ql-active {
   color: #1a73e8;
 }
-
-
 
 .docs-toast {
   position: fixed;
