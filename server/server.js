@@ -32,7 +32,7 @@ const wss = new WebSocket.Server({ server });
 setupWebSocket(wss);
 
 // Serve static files from React app in production
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === "production" && process.env.API_ONLY !== "true") {
   const clientBuildPath = path.join(__dirname, "../client/build");
   const indexHtmlPath = path.join(clientBuildPath, "index.html");
 
@@ -75,6 +75,86 @@ if (process.env.NODE_ENV === "production") {
       }
     });
   }
+} else if (
+  process.env.NODE_ENV === "production" &&
+  process.env.API_ONLY === "true"
+) {
+  // API-only mode - serve a documentation page at the root
+  console.log("Running in API-only mode");
+  app.get("/", (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Documents API - Render Deployment</title>
+        <style>
+          body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+          h1 { color: #2a62d3; }
+          h2 { color: #444; margin-top: 30px; }
+          pre { background: #f6f8fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+          .endpoint { background: #f0f4f9; padding: 10px 15px; margin: 10px 0; border-left: 4px solid #2a62d3; border-radius: 3px; }
+          .method { font-weight: bold; color: #2a62d3; }
+          .url { font-family: monospace; }
+          p { margin: 15px 0; }
+          .success { color: #0ca678; }
+          .note { background: #fff3cd; padding: 10px; border-radius: 5px; margin: 20px 0; }
+        </style>
+      </head>
+      <body>
+        <h1>Documents API - Render Deployment</h1>
+        <p class="success">✓ API Server is running successfully in API-only mode</p>
+        
+        <div class="note">
+          <strong>Note:</strong> This deployment is running in API-only mode. The client application is not included.
+        </div>
+        
+        <h2>API Endpoints</h2>
+        
+        <h3>Document Management</h3>
+        <div class="endpoint">
+          <span class="method">POST</span> <span class="url">/api/documents</span>
+          <p>Create a new document</p>
+        </div>
+        
+        <div class="endpoint">
+          <span class="method">GET</span> <span class="url">/api/documents/:id</span>
+          <p>Retrieve document by ID</p>
+        </div>
+        
+        <div class="endpoint">
+          <span class="method">PUT</span> <span class="url">/api/documents/:id</span>
+          <p>Update document</p>
+        </div>
+        
+        <div class="endpoint">
+          <span class="method">DELETE</span> <span class="url">/api/documents/:id</span>
+          <p>Delete a document</p>
+        </div>
+        
+        <div class="endpoint">
+          <span class="method">GET</span> <span class="url">/api/documents</span>
+          <p>Retrieve all documents</p>
+        </div>
+        
+        <h3>Document Sharing</h3>
+        <div class="endpoint">
+          <span class="method">POST</span> <span class="url">/api/documents/:id/share</span>
+          <p>Generate or update share ID</p>
+        </div>
+        
+        <div class="endpoint">
+          <span class="method">GET</span> <span class="url">/api/documents/:id/share-url</span>
+          <p>Retrieve share URL</p>
+        </div>
+        
+        <div class="endpoint">
+          <span class="method">GET</span> <span class="url">/api/documents/shared/:shareId</span>
+          <p>Retrieve shared document</p>
+        </div>
+      </body>
+      </html>
+    `);
+  });
 }
 
 // Error handling middleware
