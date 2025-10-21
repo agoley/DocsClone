@@ -16,18 +16,17 @@ services:
       - key: CORS_ORIGIN
         fromService:
           name: documents-app-frontend
-          type: static_site
+          type: static
           property: url
     plan: free
 
   # Frontend Static Site Service
-  - type: static_site
+  - type: static
     name: documents-app-frontend
-    env: static
-    repo: https://github.com/agoley/DocsClone # Update this if it's not correct
-    branch: render-bootstrapping # Explicit branch to deploy from
     buildCommand: cd client && npm install && npm run build
     publishDir: client/build
+    repo: https://github.com/agoley/DocsClone # Update this if it's not correct
+    branch: render-bootstrapping # Explicit branch to deploy from
     envVars:
       - key: REACT_APP_API_URL
         fromService:
