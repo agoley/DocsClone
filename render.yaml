@@ -5,11 +5,11 @@ services:
     env: node
     repo: https://github.com/agoley/DocsClone # Update this if it's not correct
     branch: render-bootstrapping # Explicit branch to deploy from
-    buildCommand: chmod +x ./build.sh && ./build.sh
+    buildCommand: cd server && npm install
     startCommand: cd server && node server.js
     envVars:
       - key: NODE_ENV
         value: production
-      - key: CI
-        value: "false"
+      - key: API_ONLY
+        value: "true"
     plan: free
