@@ -29,7 +29,7 @@ class WebSocketService {
     const wsUrl =
       process.env.REACT_APP_WS_URL ||
       (apiUrl
-        ? apiUrl.replace(/^http/, protocol)
+        ? apiUrl.replace(/^https?/, protocol)
         : `${protocol}://${window.location.host}`);
 
     this.socket = new WebSocket(wsUrl);
