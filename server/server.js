@@ -22,9 +22,9 @@ const server = http.createServer(app);
 // Configure middleware
 const corsOptions = {
   origin: process.env.CORS_ORIGIN || "*",
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
@@ -173,10 +173,29 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start the server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Run database migrations before starting the server
+const { runMigrations } = require("./db/migrations");
+
+const startServer = async () => {
+  try {
+    // Run database migrations
+    console.log("Running database migrations...");
+    await runMigrations();
+    console.log("Database migrations completed successfully");
+
+    // Start the server
+    const PORT = process.env.PORT || 5000;
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    console.error("Migration error details:", error.message);
+    process.exit(1);
+  }
+};
+
+// Start the server with migrations
+startServer();
 
 module.exports = server;

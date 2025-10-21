@@ -13,20 +13,42 @@ const createDocumentTable = async () => {
   `;
 
   try {
-    await pool.query(createTableQuery);
+    console.log("Creating documents table...");
+    const result = await pool.query(createTableQuery);
     console.log("Documents table created successfully");
+
+    // Verify table exists
+    const checkTableQuery = `
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' AND table_name = 'documents';
+    `;
+    const checkResult = await pool.query(checkTableQuery);
+    console.log("Table verification result:", checkResult.rows);
   } catch (error) {
     console.error("Error creating documents table:", error);
+    console.error("Error details:", {
+      message: error.message,
+      code: error.code,
+      query: createTableQuery,
+    });
     throw error;
   }
 };
 
 const runMigrations = async () => {
   try {
+    console.log("Starting database migrations...");
     await createDocumentTable();
     console.log("All migrations completed successfully");
   } catch (error) {
     console.error("Migration failed:", error);
+    console.error("Migration error details:", {
+      message: error.message,
+      code: error.code,
+      stack: error.stack,
+    });
+    throw error; // Re-throw to handle in server startup
   }
 };
 

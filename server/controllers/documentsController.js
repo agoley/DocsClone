@@ -88,7 +88,14 @@ const getAllDocuments = async (req, res) => {
     res.json(documents);
   } catch (error) {
     console.error("Error in getAllDocuments:", error);
-    res.status(500).json({ error: "Failed to retrieve documents" });
+    console.error("Error details:", error.message);
+    console.error("Error code:", error.code);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({
+      error: "Failed to retrieve documents",
+      details: error.message,
+      code: error.code,
+    });
   }
 };
 

@@ -1,13 +1,13 @@
 import axios from "axios";
 
 // Try to get the API URL from environment variables, with intelligent fallbacks
-const API_URL = process.env.REACT_APP_API_URL || 
-  (process.env.NODE_ENV === 'production' 
-    ? 'https://docsclone-mu6c.onrender.com'  // Your actual API URL
-    : 'http://localhost:3001'
-  );
+const API_URL =
+  process.env.REACT_APP_API_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://docsclone-mu6c.onrender.com" // Your actual API URL
+    : "http://localhost:3001");
 
-console.log('API_URL configured as:', API_URL);
+console.log("API_URL configured as:", API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
