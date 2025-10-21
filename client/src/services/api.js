@@ -22,7 +22,9 @@ export const documentsApi = {
 
   // Get a single document by ID
   getDocumentById: async (id) => {
+    console.log("Making API request to:", `${API_URL}/api/documents/${id}`);
     const response = await api.get(`/api/documents/${id}`);
+    console.log("API response:", response);
     return response.data;
   },
 

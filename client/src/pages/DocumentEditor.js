@@ -23,8 +23,10 @@ const DocumentEditor = () => {
 
   const fetchDocument = useCallback(async () => {
     try {
+      console.log("Fetching document with ID:", id);
       setLoading(true);
       const data = await documentsApi.getDocumentById(id);
+      console.log("Document fetched successfully:", data);
       setDocument(data);
       setTitle(data.title);
       setContent(data.content);
@@ -32,8 +34,14 @@ const DocumentEditor = () => {
       setError(null);
     } catch (err) {
       console.error("Error fetching document:", err);
+      console.error("Error details:", {
+        message: err.message,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data
+      });
       setError(
-        "Failed to load document. It may have been deleted or you don't have permission to view it.",
+        `Failed to load document. ${err.response?.data?.error || err.message}`,
       );
     } finally {
       setLoading(false);

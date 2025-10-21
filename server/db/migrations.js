@@ -36,9 +36,26 @@ const createDocumentTable = async () => {
   }
 };
 
+const testDatabaseConnection = async () => {
+  console.log("Testing database connection...");
+  const client = await pool.connect();
+  try {
+    const result = await client.query('SELECT NOW() as current_time');
+    console.log("Database connection test successful:", result.rows[0]);
+    return true;
+  } finally {
+    client.release();
+  }
+};
+
 const runMigrations = async () => {
   try {
     console.log("Starting database migrations...");
+    
+    // Test connection first
+    await testDatabaseConnection();
+    
+    // Run migrations
     await createDocumentTable();
     console.log("All migrations completed successfully");
   } catch (error) {
@@ -46,7 +63,7 @@ const runMigrations = async () => {
     console.error("Migration error details:", {
       message: error.message,
       code: error.code,
-      stack: error.stack,
+      stack: error.stack
     });
     throw error; // Re-throw to handle in server startup
   }
@@ -67,5 +84,6 @@ if (require.main === module) {
 
 module.exports = {
   createDocumentTable,
+  testDatabaseConnection,
   runMigrations,
 };

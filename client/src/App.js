@@ -4,6 +4,7 @@ import DocumentList from "./pages/DocumentList";
 import DocumentEditor from "./pages/DocumentEditor";
 import SharedDocument from "./pages/SharedDocument";
 import Navbar from "./components/Navbar";
+import ApiDebugger from "./components/ApiDebugger";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<DocumentList />} />
           <Route path="/documents/:id" element={<DocumentEditor />} />
           <Route path="/shared/:shareId" element={<SharedDocument />} />
+          <Route path="/debug" element={<ApiDebugger />} />
         </Routes>
       </div>
     </div>

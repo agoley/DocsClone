@@ -30,6 +30,51 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Debug endpoint
+app.get("/api/debug", async (req, res) => {
+  try {
+    const pool = require("./db/db");
+    
+    // Check if documents table exists
+    const tableCheck = await pool.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' AND table_name = 'documents'
+    `);
+    
+    // Count documents
+    let documentCount = 0;
+    let documents = [];
+    
+    if (tableCheck.rows.length > 0) {
+      const countResult = await pool.query('SELECT COUNT(*) FROM documents');
+      documentCount = parseInt(countResult.rows[0].count);
+      
+      const docsResult = await pool.query('SELECT * FROM documents LIMIT 5');
+      documents = docsResult.rows;
+    }
+    
+    res.json({
+      status: "OK",
+      database: {
+        connected: true,
+        tableExists: tableCheck.rows.length > 0,
+        documentCount,
+        sampleDocuments: documents
+      },
+      environment: process.env.NODE_ENV,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "ERROR",
+      error: error.message,
+      code: error.code,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // API routes
 app.use("/api/documents", documentsRoutes);
 app.use("/api/documents", sharingRoutes);
