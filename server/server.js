@@ -20,7 +20,14 @@ const app = express();
 const server = http.createServer(app);
 
 // Configure middleware
-app.use(cors());
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || "*",
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // API routes

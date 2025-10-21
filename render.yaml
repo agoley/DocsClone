@@ -14,22 +14,17 @@ services:
       - key: API_ONLY
         value: "true"
       - key: CORS_ORIGIN
-        fromService:
-          name: documents-app-frontend
-          type: web
-          property: url
+        value: "https://docsclone-1.onrender.com"
     plan: free
 
   # Frontend Static Site Service
   - type: web
     name: documents-app-frontend
     env: static
-    buildCommand: chmod +x ./client-build-debug.sh && ./client-build-debug.sh
-    staticPublishPath: client/build # Removed the leading ./ which can cause issues
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/build
     repo: https://github.com/agoley/DocsClone # Update this if it's not correct
     branch: render-bootstrapping # Explicit branch to deploy from
-    buildCommand: cd client && npm install && npm run build
-    publishDir: client/build
     envVars:
       - key: REACT_APP_API_URL
         fromService:
