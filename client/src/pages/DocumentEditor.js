@@ -38,7 +38,7 @@ const DocumentEditor = () => {
         message: err.message,
         status: err.response?.status,
         statusText: err.response?.statusText,
-        data: err.response?.data
+        data: err.response?.data,
       });
       setError(
         `Failed to load document. ${err.response?.data?.error || err.message}`,
