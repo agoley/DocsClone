@@ -233,52 +233,97 @@ const DocumentEditor = () => {
   }
 
   return (
-    <div>
-      <div className="header">
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <h1>Edit Document</h1>
+    <div className="docs-container">
+      {/* Google Docs-style Header */}
+      <div className="docs-header">
+        <div className="docs-header-left">
+          <div className="docs-logo">
+            <span className="docs-icon">📝</span>
+            <span className="docs-title">Docs</span>
+          </div>
+          
+          <div className="docs-document-info">
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Untitled document"
+              className="docs-title-input"
+            />
+            
+            <div className="docs-save-status">
+              {isSaving ? (
+                <span className="saving">
+                  <span className="spinner"></span>
+                  Saving...
+                </span>
+              ) : (
+                <span className="saved">All changes saved in Drive</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="docs-header-right">
           {activeUsers > 1 && (
-            <div className="users-badge">
-              {activeUsers} {activeUsers === 1 ? "user" : "users"} online
+            <div className="docs-users">
+              <span className="user-count">{activeUsers}</span>
             </div>
           )}
-        </div>
-        <div>
-          <button onClick={() => navigate("/")}>Back to List</button>
+          
+          <button className="docs-share-btn" onClick={handleShare}>
+            Share
+          </button>
+          
+          <div className="docs-menu">
+            <button className="menu-btn" onClick={() => navigate("/")}>
+              ←
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="card document-editor">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Document Title"
-          style={{ fontSize: "24px", fontWeight: "bold" }}
-        />
-
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Document content..."
-        />
-
-        <div className="document-actions">
-          <button onClick={handleShare}>Share</button>
-          <button className="danger" onClick={handleDelete}>
-            Delete
+      {/* Google Docs-style Toolbar */}
+      <div className="docs-toolbar">
+        <div className="toolbar-section">
+          <select className="font-family">
+            <option>Arial</option>
+          </select>
+          <select className="font-size">
+            <option>11</option>
+          </select>
+        </div>
+        
+        <div className="toolbar-divider"></div>
+        
+        <div className="toolbar-section">
+          <button className="toolbar-btn" title="Bold">B</button>
+          <button className="toolbar-btn" title="Italic">I</button>
+          <button className="toolbar-btn" title="Underline">U</button>
+        </div>
+        
+        <div className="toolbar-divider"></div>
+        
+        <div className="toolbar-section">
+          <button className="toolbar-btn danger" onClick={handleDelete} title="Delete document">
+            🗑️
           </button>
         </div>
-
-        {isSaving && (
-          <div
-            style={{ marginTop: "10px", color: "#5f6368", fontSize: "14px" }}
-          >
-            Saving...
-          </div>
-        )}
       </div>
 
+      {/* Google Docs-style Document */}
+      <div className="docs-editor-container">
+        <div className="docs-page">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Start typing your document..."
+            className="docs-textarea"
+          />
+        </div>
+      </div>
+
+      {/* Modals and Toasts */}
       {showShareModal && (
         <ShareModal
           shareUrl={shareUrl}
@@ -296,7 +341,7 @@ const DocumentEditor = () => {
         />
       )}
 
-      {toast.show && <div className="toast">{toast.message}</div>}
+      {toast.show && <div className="docs-toast">{toast.message}</div>}
     </div>
   );
 };

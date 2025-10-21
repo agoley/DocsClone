@@ -57,16 +57,24 @@ const DocumentList = () => {
   }
 
   return (
-    <div>
-      <div className="header">
-        <h1>My Documents</h1>
-        <button onClick={() => setShowNewDocForm(!showNewDocForm)}>
-          {showNewDocForm ? "Cancel" : "New Document"}
+    <div className="docs-home">
+      {/* Google Docs-style Header */}
+      <div className="docs-home-header">
+        <div className="docs-home-logo">
+          <span className="docs-icon">📝</span>
+          <span className="docs-title">Docs</span>
+        </div>
+        
+        <button 
+          className="docs-new-doc-btn" 
+          onClick={() => setShowNewDocForm(!showNewDocForm)}
+        >
+          {showNewDocForm ? "Cancel" : "+ Blank document"}
         </button>
       </div>
 
       {showNewDocForm && (
-        <div className="card">
+        <div className="docs-new-form">
           <h2>Create New Document</h2>
           <DocumentForm
             onSubmit={handleCreateDocument}
@@ -75,31 +83,62 @@ const DocumentList = () => {
         </div>
       )}
 
-      {documents.length > 0 ? (
-        <div className="document-list">
-          {documents.map((doc) => (
-            <Link
-              to={`/documents/${doc.id}`}
-              key={doc.id}
-              style={{ textDecoration: "none" }}
-            >
-              <div className="card document-card">
-                <h3>{doc.title}</h3>
-                <div style={{ color: "#5f6368", fontSize: "14px" }}>
-                  <div>Created: {formatDate(doc.created_at)}</div>
-                  {doc.updated_at && doc.updated_at !== doc.created_at && (
-                    <div>Last updated: {formatDate(doc.updated_at)}</div>
-                  )}
+      {/* Recent Documents Section */}
+      <div className="docs-content">
+        <div className="docs-section-header">
+          <h2>Recent documents</h2>
+        </div>
+
+        {documents.length > 0 ? (
+          <div className="docs-grid">
+            {documents.map((doc) => (
+              <Link
+                to={`/documents/${doc.id}`}
+                key={doc.id}
+                className="docs-card-link"
+              >
+                <div className="docs-document-card">
+                  <div className="docs-card-preview">
+                    <div className="docs-card-icon">📄</div>
+                  </div>
+                  
+                  <div className="docs-card-info">
+                    <h3 className="docs-card-title">{doc.title}</h3>
+                    <div className="docs-card-meta">
+                      <div className="docs-card-owner">
+                        <span className="owner-avatar">👤</span>
+                        <span>You</span>
+                      </div>
+                      <div className="docs-card-date">
+                        {doc.updated_at && doc.updated_at !== doc.created_at 
+                          ? `Opened ${formatDate(doc.updated_at)}`
+                          : `Created ${formatDate(doc.created_at)}`
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="docs-card-menu">
+                    <button className="docs-menu-btn">⋮</button>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <div className="card">
-          <p>No documents found. Create your first document to get started!</p>
-        </div>
-      )}
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="docs-empty-state">
+            <div className="empty-state-icon">📄</div>
+            <h3>No documents yet</h3>
+            <p>Create your first document to get started!</p>
+            <button 
+              className="docs-create-btn"
+              onClick={() => setShowNewDocForm(true)}
+            >
+              Create document
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
