@@ -16,15 +16,16 @@ services:
       - key: CORS_ORIGIN
         fromService:
           name: documents-app-frontend
-          type: static
+          type: web
           property: url
     plan: free
 
   # Frontend Static Site Service
-  - type: static
+  - type: web
     name: documents-app-frontend
+    env: static
     buildCommand: cd client && npm install && npm run build
-    publishDir: client/build
+    staticPublishPath: ./client/build
     repo: https://github.com/agoley/DocsClone # Update this if it's not correct
     branch: render-bootstrapping # Explicit branch to deploy from
     envVars:
