@@ -33,10 +33,48 @@ setupWebSocket(wss);
 
 // Serve static files from React app in production
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/build")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/build", "index.html"));
-  });
+  const clientBuildPath = path.join(__dirname, "../client/build");
+  const indexHtmlPath = path.join(clientBuildPath, "index.html");
+
+  try {
+    // Check if the client build directory exists
+    if (require("fs").existsSync(clientBuildPath)) {
+      app.use(express.static(clientBuildPath));
+      app.get("*", (req, res) => {
+        // Only try to serve index.html if it exists
+        if (require("fs").existsSync(indexHtmlPath)) {
+          res.sendFile(indexHtmlPath);
+        } else {
+          res
+            .status(200)
+            .send("API Server is running. Client app is not built yet.");
+        }
+      });
+      console.log("Serving static files from client/build directory");
+    } else {
+      console.log(
+        "Client build directory not found. Only API endpoints will be available.",
+      );
+      app.get("*", (req, res) => {
+        if (req.path.startsWith("/api")) {
+          // Let API routes handle these requests
+          return next();
+        }
+        res
+          .status(200)
+          .send("API Server is running. Client app is not built yet.");
+      });
+    }
+  } catch (error) {
+    console.error("Error setting up static file serving:", error);
+    app.get("*", (req, res) => {
+      if (!req.path.startsWith("/api")) {
+        res
+          .status(200)
+          .send("API Server is running. Client app is not built yet.");
+      }
+    });
+  }
 }
 
 // Error handling middleware
