@@ -14,6 +14,7 @@ This guide explains how to securely deploy your application on Render without ex
    - `RENDER_POSTGRES_URL`: This will be automatically set if you're using Render's PostgreSQL service. If not, you'll need to add it manually in the format: `postgres://username:password@host:port/database_name`
 
    If you're not using the `RENDER_POSTGRES_URL`, you'll need to add these variables individually:
+
    - `DB_HOST`: Your PostgreSQL host
    - `DB_PORT`: Your PostgreSQL port (typically 5432)
    - `DB_NAME`: Your database name
