@@ -17,8 +17,16 @@ class WebSocketService {
 
   connect() {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const apiUrl = process.env.REACT_APP_API_URL || "";
+
+    // Convert the API URL to WebSocket URL
+    // Example: https://api.example.com -> wss://api.example.com
+    // or http://localhost:3001 -> ws://localhost:3001
     const wsUrl =
-      process.env.REACT_APP_WS_URL || `${protocol}://${window.location.host}`;
+      process.env.REACT_APP_WS_URL ||
+      (apiUrl
+        ? apiUrl.replace(/^http/, protocol)
+        : `${protocol}://${window.location.host}`);
 
     this.socket = new WebSocket(wsUrl);
 

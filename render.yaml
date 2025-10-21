@@ -1,7 +1,8 @@
 # render.yaml
 services:
+  # Backend API Service
   - type: web
-    name: documents-app-backend
+    name: documents-app-api
     env: node
     repo: https://github.com/agoley/DocsClone # Update this if it's not correct
     branch: render-bootstrapping # Explicit branch to deploy from
@@ -12,4 +13,30 @@ services:
         value: production
       - key: API_ONLY
         value: "true"
+      - key: CORS_ORIGIN
+        fromService:
+          name: documents-app-frontend
+          type: static_site
+          property: url
     plan: free
+
+  # Frontend Static Site Service
+  - type: static_site
+    name: documents-app-frontend
+    env: static
+    repo: https://github.com/agoley/DocsClone # Update this if it's not correct
+    branch: render-bootstrapping # Explicit branch to deploy from
+    buildCommand: cd client && npm install && npm run build
+    publishDir: client/build
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          name: documents-app-api
+          type: web
+          property: url
+      - key: NODE_ENV
+        value: production
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-store
