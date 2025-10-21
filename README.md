@@ -129,22 +129,23 @@ The backend is configured for deployment on Render:
 
 1. Create a new Web Service on Render
 2. Link to your GitHub repository
-3. Set the build command to `cd server && npm install`
+3. Choose "Use render.yaml from the repo"
+4. The render.yaml file will automatically:
+   - Build the client application
+   - Install server dependencies
+   - Configure the environment
+5. Add your database connection details in the Environment Variables section
+
+### Alternative Manual Configuration
+
+If you prefer to configure manually:
+
+1. Create a new Web Service on Render
+2. Link to your GitHub repository
+3. Set the build command to `cd client && npm install && npm run build && cd ../server && npm install`
 4. Set the start command to `cd server && node server.js`
-5. Add environment variables for database connection
-
-### Frontend
-
-The frontend can be deployed separately or served from the backend:
-
-1. Build the frontend:
-
-```bash
-cd client
-npm run build
-```
-
-2. The backend is already configured to serve the frontend static files in production mode.
+5. Set the environment variable `NODE_ENV` to `production`
+6. Add your database connection details (either `RENDER_POSTGRES_URL` or individual connection parameters)
 
 ## Database
 
