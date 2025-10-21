@@ -18,11 +18,10 @@ services:
     plan: free
 
   # Frontend Static Site Service
-  - type: web
+  - type: static
     name: documents-app-frontend
-    env: static
     buildCommand: cd client && npm install && npm run build
-    staticPublishPath: client/build
+    publishDir: client/build
     repo: https://github.com/agoley/DocsClone # Update this if it's not correct
     branch: render-bootstrapping # Explicit branch to deploy from
     envVars:

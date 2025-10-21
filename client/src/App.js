@@ -16,19 +16,22 @@ function App() {
           <Route path="/documents/:id" element={<DocumentEditor />} />
           <Route path="/shared/:shareId" element={<SharedDocument />} />
           <Route path="/debug" element={<ApiDebugger />} />
-          <Route path="*" element={
-            <div style={{padding: '20px'}}>
-              <h2>404 - Page Not Found</h2>
-              <p>Current URL: {window.location.pathname}</p>
-              <p>Available routes:</p>
-              <ul>
-                <li>/</li>
-                <li>/documents/:id</li>
-                <li>/shared/:shareId</li>
-                <li>/debug</li>
-              </ul>
-            </div>
-          } />
+          <Route
+            path="*"
+            element={
+              <div style={{ padding: "20px" }}>
+                <h2>404 - Page Not Found</h2>
+                <p>Current URL: {window.location.pathname}</p>
+                <p>Available routes:</p>
+                <ul>
+                  <li>/</li>
+                  <li>/documents/:id</li>
+                  <li>/shared/:shareId</li>
+                  <li>/debug</li>
+                </ul>
+              </div>
+            }
+          />
         </Routes>
       </div>
     </div>
