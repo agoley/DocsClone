@@ -196,9 +196,9 @@ const handleCursorUpdate = (ws, data, activeConnections) => {
   if (!documentId || !userId || !range) {
     ws.send(
       JSON.stringify({
-        type: "error", 
-        message: "Invalid cursor update data"
-      })
+        type: "error",
+        message: "Invalid cursor update data",
+      }),
     );
     return;
   }
@@ -209,7 +209,7 @@ const handleCursorUpdate = (ws, data, activeConnections) => {
     documentId,
     userId,
     range,
-    timestamp: timestamp || Date.now()
+    timestamp: timestamp || Date.now(),
   });
 };
 
