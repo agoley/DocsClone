@@ -1,4 +1,6 @@
-# SkyWrite - Wind-Powered Document Editor 🌬️
+# SkyWrite ✈️ - Wind-Powered Document Editor
+
+![SkyWrite Logo](client/src/assets/skywrite-logo.svg)
 
 A beautiful, wind-themed collaborative document editor with real-time collaboration features. Built with React, Node.js, Express, PostgreSQL, and WebSockets. Let your ideas flow like the wind across the digital sky.
 

@@ -228,7 +228,16 @@ textarea {
   gap: 8px;
   color: var(--gust-navy);
   font-weight: 600;
-  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.docs-logo:hover {
+  transform: translateY(-1px);
+}
+
+.docs-logo svg {
+  filter: drop-shadow(0 2px 4px rgba(21, 101, 192, 0.1));
 }
 
 .docs-icon {
@@ -379,7 +388,8 @@ textarea {
 .toolbar-section {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
+  padding: 4px;
 }
 
 .toolbar-divider {
@@ -403,28 +413,43 @@ textarea {
   background: none;
   border: none;
   color: #3c4043;
-  padding: 8px;
-  border-radius: 4px;
+  padding: 8px 12px;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 14px;
-  width: 32px;
-  height: 32px;
+  min-width: 48px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .toolbar-btn:hover {
-  background-color: #f1f3f4;
+  background-color: var(--gentle-blue);
+  transform: translateY(-1px);
 }
 
 .toolbar-btn.danger {
-  color: #d93025;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+  background: linear-gradient(145deg, #fff 0%, #ffebee 100%);
+  font-weight: 600;
+  min-width: auto;
+  padding: 8px 16px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
 }
 
 .toolbar-btn.danger:hover {
-  background-color: #fce8e6;
+  background: linear-gradient(145deg, #ffebee 0%, #ffcdd2 100%);
+  color: #b71c1c;
+  border-color: #ef5350;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(198, 40, 40, 0.2);
 }
 
 .docs-editor-container {
@@ -607,7 +632,16 @@ textarea {
   gap: 8px;
   color: var(--gust-navy);
   font-weight: 600;
-  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.docs-home-logo:hover {
+  transform: scale(1.02);
+}
+
+.docs-home-logo svg {
+  filter: drop-shadow(0 4px 8px rgba(21, 101, 192, 0.15));
 }
 
 .docs-new-doc-btn {

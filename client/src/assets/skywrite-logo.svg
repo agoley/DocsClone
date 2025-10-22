@@ -1,0 +1,12 @@
+<svg width="200" height="100" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- SkyWrite Text -->
+  <text x="20" y="45" font-family="Google Sans, Roboto, Arial, sans-serif" font-size="32" font-weight="500" fill="#1976d2">Sky</text>
+  <text x="20" y="75" font-family="Google Sans, Roboto, Arial, sans-serif" font-size="32" font-weight="500" fill="#1976d2">Write</text>
+  
+  <!-- Paper Airplane -->
+  <path d="M120 25 L140 35 L125 42 L135 50 L120 45 L110 50 L120 42 L105 35 Z" fill="#1976d2" stroke="none"/>
+  <path d="M120 25 L140 35 L125 42 Z" fill="#42a5f5" stroke="none"/>
+  
+  <!-- "by Air" text -->
+  <text x="110" y="70" font-family="Google Sans, Roboto, Arial, sans-serif" font-size="14" fill="#666">by Air</text>
+</svg>

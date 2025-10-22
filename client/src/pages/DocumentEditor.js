@@ -4,6 +4,7 @@ import { documentsApi } from "../services/api";
 import wsService from "../services/websocket";
 import ShareModal from "../components/ShareModal";
 import RichTextEditor from "../components/RichTextEditor";
+import SkyWriteLogo from "../components/SkyWriteLogo";
 
 const DocumentEditor = () => {
   const { id } = useParams();
@@ -453,9 +454,8 @@ const DocumentEditor = () => {
       <div className="docs-container">
         <div className="docs-header">
           <div className="docs-header-left">
-            <div className="docs-logo">
-              <span className="docs-icon">🌬️</span>
-              <span className="docs-title">SkyWrite</span>
+            <div className="docs-logo" onClick={() => navigate("/")}>
+              <SkyWriteLogo size="small" showTagline={false} />
             </div>
           </div>
           <div className="docs-header-right">
@@ -485,9 +485,8 @@ const DocumentEditor = () => {
       {/* Google Docs-style Header */}
       <div className="docs-header">
         <div className="docs-header-left">
-          <div className="docs-logo">
-            <span className="docs-icon">🌬️</span>
-            <span className="docs-title">SkyWrite</span>
+          <div className="docs-logo" onClick={() => navigate("/")}>
+            <SkyWriteLogo size="small" showTagline={false} />
           </div>
 
           <div className="docs-document-info">

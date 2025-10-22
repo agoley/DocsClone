@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { documentsApi } from "../services/api";
 import DocumentForm from "../components/DocumentForm";
+import SkyWriteLogo from "../components/SkyWriteLogo";
 
 const DocumentList = () => {
   const [documents, setDocuments] = useState([]);
@@ -61,8 +62,7 @@ const DocumentList = () => {
       {/* Google Docs-style Header */}
       <div className="docs-home-header">
         <div className="docs-home-logo">
-          <span className="docs-icon">🌬️</span>
-          <span className="docs-title">SkyWrite</span>
+          <SkyWriteLogo size="normal" showTagline={true} />
         </div>
 
         <button
