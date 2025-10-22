@@ -271,7 +271,7 @@ const DocumentEditor = () => {
     };
 
     const handleVisibilityChange = () => {
-      if (document.hidden) {
+      if (window.document.hidden) {
         // Tab is hidden, remove cursor
         wsService.sendMessage({
           type: "cursor-remove",
@@ -282,11 +282,11 @@ const DocumentEditor = () => {
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [id]);
 
