@@ -56,8 +56,12 @@ const RichTextEditor = forwardRef(
 
     // Handle cursor updates from other users
     useEffect(() => {
+      console.log("RichTextEditor userCursors updated:", userCursors);
       const editor = quillRef.current?.getEditor();
-      if (!editor) return;
+      if (!editor) {
+        console.log("No editor available");
+        return;
+      }
 
       // Clear existing cursor overlays from both container and root
       const existingCursors = editor.container.querySelectorAll(

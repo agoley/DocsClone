@@ -8,6 +8,7 @@ class WebSocketService {
       "user-joined": [],
       "user-left": [],
       "cursor-update": [],
+      "cursor-remove": [],
       "user-disconnected": [],
       error: [],
     };

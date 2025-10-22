@@ -35,6 +35,10 @@ const setupWebSocket = (wss) => {
             handleCursorUpdate(ws, data, activeConnections);
             break;
 
+          case "cursor-remove":
+            handleCursorRemove(ws, data, activeConnections);
+            break;
+
           default:
             console.warn("Unknown WebSocket message type:", data.type);
         }
@@ -214,6 +218,30 @@ const handleCursorUpdate = (ws, data, activeConnections) => {
     userId,
     range,
     timestamp: timestamp || Date.now(),
+  });
+};
+
+// Handle cursor removal (when user leaves or closes tab)
+const handleCursorRemove = (ws, data, activeConnections) => {
+  const { documentId, userId } = data;
+
+  // Validate data
+  if (!documentId || !userId) {
+    ws.send(
+      JSON.stringify({
+        type: "error",
+        message: "Invalid cursor remove data",
+      }),
+    );
+    return;
+  }
+
+  // Broadcast cursor removal to other users in the document
+  broadcastToDocument(documentId, activeConnections, ws, {
+    type: "cursor-remove",
+    documentId,
+    userId,
+    timestamp: Date.now(),
   });
 };
 

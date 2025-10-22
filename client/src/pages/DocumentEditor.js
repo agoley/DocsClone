@@ -166,10 +166,15 @@ const DocumentEditor = () => {
     };
 
     const cursorUpdateHandler = (data) => {
+      console.log("Received cursor update:", data);
+      console.log("Current document ID:", id);
+      console.log("Current client ID:", wsService.getClientId());
+
       if (
         data.documentId.toString() === id.toString() &&
         data.userId !== wsService.getClientId()
       ) {
+        console.log("Processing cursor update for user:", data.userId);
         setUserCursors((prev) => {
           const newCursors = {
             ...prev,
@@ -179,15 +184,7 @@ const DocumentEditor = () => {
               userId: data.userId,
             },
           };
-
-          // Clean up cursors older than 30 seconds (user probably disconnected)
-          const now = Date.now();
-          Object.keys(newCursors).forEach((userId) => {
-            if (now - newCursors[userId].timestamp > 30000) {
-              delete newCursors[userId];
-            }
-          });
-
+          console.log("Updated cursors:", newCursors);
           return newCursors;
         });
       }
@@ -201,6 +198,18 @@ const DocumentEditor = () => {
           return newCursors;
         });
         setActiveUsers(data.activeUsers);
+      }
+    };
+
+    const cursorRemoveHandler = (data) => {
+      console.log("Received cursor remove:", data);
+      if (data.documentId.toString() === id.toString()) {
+        setUserCursors((prev) => {
+          const newCursors = { ...prev };
+          delete newCursors[data.userId];
+          console.log("Removed cursor for user:", data.userId);
+          return newCursors;
+        });
       }
     };
 
@@ -227,6 +236,10 @@ const DocumentEditor = () => {
       "user-disconnected",
       userDisconnectedHandler,
     );
+    const unsubscribeCursorRemove = wsService.on(
+      "cursor-remove",
+      cursorRemoveHandler,
+    );
 
     return () => {
       // Clean up event listeners and leave document
@@ -237,10 +250,45 @@ const DocumentEditor = () => {
       unsubscribeError();
       unsubscribeCursorUpdate();
       unsubscribeUserDisconnected();
+      unsubscribeCursorRemove();
 
       wsService.leaveDocument(id);
     };
   }, [document, id]);
+
+  // Handle tab/window close to clean up cursors
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Send final cursor removal before leaving
+      wsService.sendMessage({
+        type: "cursor-remove",
+        documentId: id,
+        userId: wsService.getClientId(),
+      });
+
+      // Leave document properly
+      wsService.leaveDocument(id);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Tab is hidden, remove cursor
+        wsService.sendMessage({
+          type: "cursor-remove",
+          documentId: id,
+          userId: wsService.getClientId(),
+        });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [id]);
 
   // Debounced save
   useEffect(() => {
@@ -282,6 +330,9 @@ const DocumentEditor = () => {
 
   const handleSelectionChange = useCallback(
     (range) => {
+      console.log("Selection changed:", range);
+      console.log("isUpdatingFromRemote:", isUpdatingFromRemote.current);
+
       if (range && !isUpdatingFromRemote.current) {
         // Debounce cursor updates to reduce network traffic but keep them fast
         if (cursorTimeoutRef.current) {
@@ -289,6 +340,12 @@ const DocumentEditor = () => {
         }
 
         cursorTimeoutRef.current = setTimeout(() => {
+          console.log("Sending cursor update:", {
+            documentId: id,
+            userId: wsService.getClientId(),
+            range: range,
+            timestamp: Date.now(),
+          });
           wsService.sendCursorUpdate(id, {
             userId: wsService.getClientId(),
             range: range,
