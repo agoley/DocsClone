@@ -1,13 +1,14 @@
-# Document Management Web Application
+# SkyWrite - Wind-Powered Document Editor 🌬️
 
-A full-stack web application for document management with real-time collaboration features, built with React, Node.js, Express, PostgreSQL, and WebSockets.
+A beautiful, wind-themed collaborative document editor with real-time collaboration features. Built with React, Node.js, Express, PostgreSQL, and WebSockets. Let your ideas flow like the wind across the digital sky.
 
 ## Features
 
-- Create, read, update, and delete documents
-- Real-time collaborative editing using WebSockets
-- Document sharing functionality
-- Responsive UI for desktop and mobile devices
+- ✨ Create, edit, and manage documents with a beautiful wind-themed interface
+- 🌪️ Real-time collaborative editing using WebSockets - watch changes flow like the wind
+- 🌤️ Document sharing functionality with sky-inspired design
+- 💨 Responsive UI that moves gracefully across desktop and mobile devices
+- 🌬️ Wind-themed animations and visual effects for a delightful writing experience
 
 ## Project Structure
 

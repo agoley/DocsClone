@@ -20,14 +20,16 @@ function App() {
             path="*"
             element={
               <div className="docs-404">
-                <h2>404 - Page Not Found</h2>
+                <div style={{ fontSize: "48px", marginBottom: "16px" }}>🌪️</div>
+                <h2>404 - Lost in the Wind</h2>
+                <p>The page you're looking for has blown away...</p>
                 <p>Current URL: {window.location.pathname}</p>
                 <p>Available routes:</p>
                 <ul>
-                  <li>/</li>
-                  <li>/documents/:id</li>
-                  <li>/shared/:shareId</li>
-                  <li>/debug</li>
+                  <li>/ - SkyWrite Home</li>
+                  <li>/documents/:id - Document Editor</li>
+                  <li>/shared/:shareId - Shared Documents</li>
+                  <li>/debug - Debug Tools</li>
                 </ul>
               </div>
             }

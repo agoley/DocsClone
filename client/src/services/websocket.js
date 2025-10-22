@@ -39,7 +39,7 @@ class WebSocketService {
     this.socket = new WebSocket(wsUrl);
 
     this.socket.onopen = () => {
-      console.log("WebSocket connected");
+      console.log("🌬️ SkyWrite connected to the wind currents");
       this.isConnected = true;
       this.reconnectAttempts = 0;
 

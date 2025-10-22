@@ -61,15 +61,15 @@ const DocumentList = () => {
       {/* Google Docs-style Header */}
       <div className="docs-home-header">
         <div className="docs-home-logo">
-          <span className="docs-icon">📝</span>
-          <span className="docs-title">Docs</span>
+          <span className="docs-icon">🌬️</span>
+          <span className="docs-title">SkyWrite</span>
         </div>
 
         <button
           className="docs-new-doc-btn"
           onClick={() => setShowNewDocForm(!showNewDocForm)}
         >
-          {showNewDocForm ? "Cancel" : "+ Blank document"}
+          {showNewDocForm ? "Cancel" : "🌬️ New Document"}
         </button>
       </div>
 
@@ -99,7 +99,7 @@ const DocumentList = () => {
               >
                 <div className="docs-document-card">
                   <div className="docs-card-preview">
-                    <div className="docs-card-icon">📄</div>
+                    <div className="docs-card-icon">🌬️</div>
                   </div>
 
                   <div className="docs-card-info">

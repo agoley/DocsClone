@@ -14,7 +14,7 @@ const RichTextEditor = forwardRef(
     {
       value,
       onChange,
-      placeholder = "Start typing...",
+      placeholder = "Let your thoughts take flight...",
       onSelectionChange,
       userCursors = {},
     },

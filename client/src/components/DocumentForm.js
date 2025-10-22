@@ -33,7 +33,7 @@ const DocumentForm = ({
       <div>
         <input
           type="text"
-          placeholder="Document Title"
+          placeholder="Give your document wings..."
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
@@ -42,7 +42,7 @@ const DocumentForm = ({
 
       <div>
         <textarea
-          placeholder="Document Content"
+          placeholder="Let your ideas soar..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />

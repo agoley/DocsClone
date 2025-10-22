@@ -6,7 +6,7 @@ const activeConnections = new Map();
 // Set up WebSocket server
 const setupWebSocket = (wss) => {
   wss.on("connection", (ws) => {
-    console.log("New WebSocket connection established");
+    console.log("🌪️ New wind current established - SkyWrite connection active");
     let documentId = null;
     let userId = null;
 

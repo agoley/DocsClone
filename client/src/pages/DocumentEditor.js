@@ -282,11 +282,17 @@ const DocumentEditor = () => {
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-    window.document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange,
+    );
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange,
+      );
     };
   }, [id]);
 
@@ -448,8 +454,8 @@ const DocumentEditor = () => {
         <div className="docs-header">
           <div className="docs-header-left">
             <div className="docs-logo">
-              <span className="docs-icon">📝</span>
-              <span className="docs-title">Docs</span>
+              <span className="docs-icon">🌬️</span>
+              <span className="docs-title">SkyWrite</span>
             </div>
           </div>
           <div className="docs-header-right">
@@ -480,8 +486,8 @@ const DocumentEditor = () => {
       <div className="docs-header">
         <div className="docs-header-left">
           <div className="docs-logo">
-            <span className="docs-icon">📝</span>
-            <span className="docs-title">Docs</span>
+            <span className="docs-icon">🌬️</span>
+            <span className="docs-title">SkyWrite</span>
           </div>
 
           <div className="docs-document-info">
@@ -500,7 +506,9 @@ const DocumentEditor = () => {
                   Saving...
                 </span>
               ) : (
-                <span className="saved">All changes saved in Drive</span>
+                <span className="saved">
+                  ✨ All changes carried by the wind
+                </span>
               )}
             </div>
           </div>
@@ -533,7 +541,7 @@ const DocumentEditor = () => {
             onClick={handleDelete}
             title="Delete document"
           >
-            🗑️ Delete
+            🌪️ Scatter to Wind
           </button>
         </div>
       </div>
@@ -547,7 +555,7 @@ const DocumentEditor = () => {
             onChange={handleContentChange}
             onSelectionChange={handleSelectionChange}
             userCursors={userCursors}
-            placeholder="Start typing your document..."
+            placeholder="Let your ideas flow like the wind..."
           />
         </div>
       </div>
