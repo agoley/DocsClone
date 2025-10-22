@@ -1,12 +1,29 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useRef, useImperativeHandle, forwardRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
-const RichTextEditor = ({
+const RichTextEditor = forwardRef(({
   value,
   onChange,
   placeholder = "Start typing...",
-}) => {
+  onSelectionChange,
+}, ref) => {
+  const quillRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    getEditor: () => quillRef.current?.getEditor(),
+    updateContent: (content) => {
+      const editor = quillRef.current?.getEditor();
+      if (editor && editor.root.innerHTML !== content) {
+        const selection = editor.getSelection();
+        editor.root.innerHTML = content;
+        // Restore selection if it was present
+        if (selection) {
+          editor.setSelection(selection);
+        }
+      }
+    }
+  }));
   // Custom toolbar configuration
   const modules = useMemo(
     () => ({
@@ -50,17 +67,31 @@ const RichTextEditor = ({
 
   const handleChange = useCallback(
     (content, delta, source, editor) => {
-      onChange(content);
+      // Only trigger onChange for user changes, not API updates
+      if (source === 'user') {
+        onChange(content);
+      }
     },
     [onChange],
+  );
+
+  const handleSelectionChange = useCallback(
+    (range, source, editor) => {
+      if (onSelectionChange && source === 'user') {
+        onSelectionChange(range);
+      }
+    },
+    [onSelectionChange],
   );
 
   return (
     <div className="rich-text-editor">
       <ReactQuill
+        ref={quillRef}
         theme="snow"
         value={value}
         onChange={handleChange}
+        onChangeSelection={handleSelectionChange}
         modules={modules}
         formats={formats}
         placeholder={placeholder}
@@ -72,6 +103,6 @@ const RichTextEditor = ({
       />
     </div>
   );
-};
+});
 
 export default RichTextEditor;

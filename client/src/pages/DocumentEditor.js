@@ -21,6 +21,10 @@ const DocumentEditor = () => {
 
   const saveTimeoutRef = useRef(null);
   const lastSavedContent = useRef({ title: "", content: "" });
+  const lastRemoteUpdate = useRef(0);
+  const ignoreNextUpdate = useRef(false);
+  const editorRef = useRef(null);
+  const isUpdatingFromRemote = useRef(false);
 
   const fetchDocument = useCallback(async () => {
     try {
@@ -34,7 +38,11 @@ const DocumentEditor = () => {
       setDocument(data);
       setTitle(data.title);
       setContent(data.content);
-      lastSavedContent.current = { title: data.title, content: data.content };
+      lastSavedContent.current = { 
+        title: data.title, 
+        content: data.content, 
+        timestamp: Date.now() 
+      };
     } catch (err) {
       console.error("Error fetching document:", err);
       console.error("Error details:", {
@@ -68,18 +76,53 @@ const DocumentEditor = () => {
 
     const documentUpdatedHandler = (data) => {
       if (data.document.id.toString() === id.toString()) {
-        setTitle(data.document.title);
-        setContent(data.document.content);
-        lastSavedContent.current = {
-          title: data.document.title,
-          content: data.document.content,
-        };
-        setToast({ show: true, message: "Document updated by another user" });
-
-        // Hide toast after 3 seconds
-        setTimeout(() => {
-          setToast({ show: false, message: "" });
-        }, 3000);
+        const now = Date.now();
+        
+        // If we just sent an update, ignore the echo
+        if (ignoreNextUpdate.current) {
+          ignoreNextUpdate.current = false;
+          return;
+        }
+        
+        // Only update if this is a newer change than what we have
+        if (now - lastRemoteUpdate.current < 2000) {
+          // Recent remote update, be more cautious
+          console.log("Recent remote update detected, checking if we should apply changes");
+        }
+        
+        lastRemoteUpdate.current = now;
+        
+        // Update title if different
+        if (data.document.title !== title) {
+          setTitle(data.document.title);
+        }
+        
+        // Only update content if it's actually different and not from recent local changes
+        if (data.document.content !== content && data.document.content !== lastSavedContent.current.content) {
+          isUpdatingFromRemote.current = true;
+          
+          // Use the editor ref to update content without triggering onChange
+          if (editorRef.current && editorRef.current.updateContent) {
+            editorRef.current.updateContent(data.document.content);
+          }
+          
+          setContent(data.document.content);
+          
+          // Reset the flag after state update
+          setTimeout(() => {
+            isUpdatingFromRemote.current = false;
+          }, 100);
+          lastSavedContent.current = {
+            title: data.document.title,
+            content: data.document.content,
+            timestamp: now,
+          };
+          
+          setToast({ show: true, message: "Document updated by another user" });
+          setTimeout(() => {
+            setToast({ show: false, message: "" });
+          }, 3000);
+        }
       }
     };
 
@@ -136,7 +179,7 @@ const DocumentEditor = () => {
 
   // Debounced save
   useEffect(() => {
-    if (loading || !document) return;
+    if (loading || !document || isUpdatingFromRemote.current) return;
 
     if (
       title === lastSavedContent.current.title &&
@@ -150,8 +193,11 @@ const DocumentEditor = () => {
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      saveDocument();
-    }, 1000); // Save after 1 second of inactivity
+      // Double check we're not in the middle of a remote update
+      if (!isUpdatingFromRemote.current) {
+        saveDocument();
+      }
+    }, 2000); // Save after 2 seconds of inactivity
 
     return () => {
       if (saveTimeoutRef.current) {
@@ -159,6 +205,15 @@ const DocumentEditor = () => {
       }
     };
   }, [title, content]);
+
+  const handleContentChange = useCallback((newContent) => {
+    // Don't save if this change is from a remote update
+    if (isUpdatingFromRemote.current) {
+      return;
+    }
+    
+    setContent(newContent);
+  }, []);
 
   const saveDocument = async () => {
     if (
@@ -171,9 +226,18 @@ const DocumentEditor = () => {
 
     try {
       setIsSaving(true);
+      const now = Date.now();
+      
       await documentsApi.updateDocument(id, { title, content });
-      lastSavedContent.current = { title, content };
+      lastSavedContent.current = { 
+        title, 
+        content, 
+        timestamp: now 
+      };
 
+      // Mark that we're sending an update to ignore the echo
+      ignoreNextUpdate.current = true;
+      
       // Update through WebSocket for real-time collaboration
       wsService.updateDocument(id, title, content);
     } catch (err) {
@@ -326,8 +390,9 @@ const DocumentEditor = () => {
       <div className="docs-editor-container">
         <div className="docs-page">
           <RichTextEditor
+            ref={editorRef}
             value={content}
-            onChange={setContent}
+            onChange={handleContentChange}
             placeholder="Start typing your document..."
           />
         </div>
