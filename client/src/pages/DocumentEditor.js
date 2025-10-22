@@ -326,10 +326,21 @@ const DocumentEditor = () => {
       wsService.updateDocument(id, title, content);
     } catch (err) {
       console.error("Error saving document:", err);
-      setToast({ show: true, message: "Failed to save document" });
+
+      let errorMessage = "Failed to save document";
+
+      // Handle specific error types
+      if (err.response?.status === 413) {
+        errorMessage =
+          "Content too large. Please reduce image sizes or document length.";
+      } else if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      }
+
+      setToast({ show: true, message: errorMessage });
       setTimeout(() => {
         setToast({ show: false, message: "" });
-      }, 3000);
+      }, 5000); // Show longer for error messages
     } finally {
       setIsSaving(false);
     }

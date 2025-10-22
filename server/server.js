@@ -28,7 +28,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Debug endpoint
 app.get("/api/debug", async (req, res) => {
@@ -78,6 +79,25 @@ app.get("/api/debug", async (req, res) => {
 // API routes
 app.use("/api/documents", documentsRoutes);
 app.use("/api/documents", sharingRoutes);
+
+// Global error handler for payload too large
+app.use((error, req, res, next) => {
+  if (error.type === "entity.too.large") {
+    return res.status(413).json({
+      error: "Request payload too large",
+      message:
+        "Please reduce the size of your content or images. Maximum allowed size is 50MB.",
+      maxSize: "50MB",
+    });
+  }
+
+  // Log other errors
+  console.error("Unhandled error:", error);
+  res.status(500).json({
+    error: "Internal server error",
+    message: error.message,
+  });
+});
 
 // Setup WebSocket server
 const wss = new WebSocket.Server({ server });

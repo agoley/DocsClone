@@ -40,6 +40,10 @@ const updateDocument = async (req, res) => {
     const { id } = req.params;
     const { title, content } = req.body;
 
+    // Log content size for debugging
+    const contentSize = content ? JSON.stringify(content).length : 0;
+    console.log(`Updating document ${id}, content size: ${contentSize} bytes`);
+
     if (!title && content === undefined) {
       return res
         .status(400)
@@ -59,6 +63,16 @@ const updateDocument = async (req, res) => {
     res.json(updatedDocument);
   } catch (error) {
     console.error("Error in updateDocument:", error);
+
+    // Handle specific error types
+    if (error.type === "entity.too.large") {
+      return res.status(413).json({
+        error:
+          "Request payload too large. Please reduce image size or content length.",
+        details: "Maximum allowed size is 50MB",
+      });
+    }
+
     res.status(500).json({ error: "Failed to update document" });
   }
 };
