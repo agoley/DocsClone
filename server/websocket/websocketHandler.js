@@ -8,6 +8,7 @@ const setupWebSocket = (wss) => {
   wss.on("connection", (ws) => {
     console.log("New WebSocket connection established");
     let documentId = null;
+    let userId = null;
 
     ws.on("message", async (message) => {
       try {
@@ -17,6 +18,8 @@ const setupWebSocket = (wss) => {
           case "join-document":
             await handleJoinDocument(ws, data, activeConnections);
             documentId = data.documentId;
+            userId = data.userId;
+            ws.userId = userId; // Store userId on the WebSocket
             break;
 
           case "updated-document":
@@ -46,7 +49,7 @@ const setupWebSocket = (wss) => {
     // Handle disconnect
     ws.on("close", () => {
       if (documentId) {
-        handleLeaveDocument(ws, { documentId }, activeConnections);
+        handleLeaveDocument(ws, { documentId, userId }, activeConnections);
       }
       console.log("WebSocket connection closed");
     });
@@ -164,7 +167,7 @@ const handleDocumentUpdate = async (ws, data, activeConnections) => {
 
 // Handle leaving a document
 const handleLeaveDocument = (ws, data, activeConnections) => {
-  const { documentId } = data;
+  const { documentId, userId } = data;
 
   if (activeConnections.has(documentId)) {
     const connections = activeConnections.get(documentId);
@@ -175,6 +178,7 @@ const handleLeaveDocument = (ws, data, activeConnections) => {
       broadcastToDocument(documentId, activeConnections, ws, {
         type: "user-left",
         documentId,
+        userId: userId || ws.userId,
         activeUsers: connections.size,
       });
     } else {

@@ -111,6 +111,7 @@ class WebSocketService {
     this.sendMessage({
       type: "join-document",
       documentId: documentId.toString(),
+      userId: this.clientId,
     });
   }
 

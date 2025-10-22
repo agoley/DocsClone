@@ -145,6 +145,15 @@ const DocumentEditor = () => {
     const userLeftHandler = (data) => {
       if (data.documentId.toString() === id.toString()) {
         setActiveUsers(data.activeUsers);
+
+        // Remove cursor for user who left
+        if (data.userId) {
+          setUserCursors((prev) => {
+            const newCursors = { ...prev };
+            delete newCursors[data.userId];
+            return newCursors;
+          });
+        }
       }
     };
 
@@ -160,14 +169,26 @@ const DocumentEditor = () => {
         data.documentId.toString() === id.toString() &&
         data.userId !== wsService.getClientId()
       ) {
-        setUserCursors((prev) => ({
-          ...prev,
-          [data.userId]: {
-            range: data.range,
-            timestamp: data.timestamp,
-            userId: data.userId,
-          },
-        }));
+        setUserCursors((prev) => {
+          const newCursors = {
+            ...prev,
+            [data.userId]: {
+              range: data.range,
+              timestamp: data.timestamp,
+              userId: data.userId,
+            },
+          };
+
+          // Clean up cursors older than 30 seconds (user probably disconnected)
+          const now = Date.now();
+          Object.keys(newCursors).forEach((userId) => {
+            if (now - newCursors[userId].timestamp > 30000) {
+              delete newCursors[userId];
+            }
+          });
+
+          return newCursors;
+        });
       }
     };
 
