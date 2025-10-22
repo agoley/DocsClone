@@ -57,21 +57,79 @@ const RichTextEditor = forwardRef(
     // Handle cursor updates from other users
     useEffect(() => {
       console.log("RichTextEditor userCursors updated:", userCursors);
+      console.log("Number of cursors:", Object.keys(userCursors).length);
       const editor = quillRef.current?.getEditor();
-      if (!editor) {
-        console.log("No editor available");
+      const containerRef = quillRef.current?.container;
+      if (!editor || !containerRef) {
+        console.log("No editor or container available");
         return;
       }
 
-      // Clear existing cursor overlays from both container and root
-      const existingCursors = editor.container.querySelectorAll(
-        ".collaborative-cursor",
-      );
-      existingCursors.forEach((cursor) => cursor.remove());
+      // Create or get the cursor overlay container
+      let cursorOverlay = containerRef.querySelector(".cursor-overlay");
+      if (!cursorOverlay) {
+        cursorOverlay = document.createElement("div");
+        cursorOverlay.className = "cursor-overlay";
+        cursorOverlay.style.cssText = `
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 1000;
+        `;
+        containerRef.style.position = "relative";
+        containerRef.appendChild(cursorOverlay);
+        console.log("Created cursor overlay container");
+      }
 
-      // Also clear from the editor root
-      const rootCursors = editor.root.querySelectorAll(".collaborative-cursor");
-      rootCursors.forEach((cursor) => cursor.remove());
+      // Clear existing cursor elements
+      cursorOverlay.innerHTML = "";
+      console.log("Cleared existing cursors");
+
+      // For testing: always add a test cursor to verify overlay works
+      const testCursor = document.createElement("div");
+      testCursor.className = "collaborative-cursor test-cursor";
+      testCursor.style.cssText = `
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        width: 3px;
+        height: 20px;
+        background-color: #ff0000;
+        pointer-events: none;
+        z-index: 1001;
+        border-radius: 1px;
+      `;
+
+      const testLabel = document.createElement("div");
+      testLabel.textContent = "TEST";
+      testLabel.style.cssText = `
+        position: absolute;
+        top: -22px;
+        left: -2px;
+        background: #ff0000;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 500;
+      `;
+      testCursor.appendChild(testLabel);
+      cursorOverlay.appendChild(testCursor);
+      console.log(
+        "Added test cursor to overlay at",
+        testCursor.getBoundingClientRect(),
+      );
+
+      // Don't render real cursors if there are none
+      if (!userCursors || Object.keys(userCursors).length === 0) {
+        console.log(
+          "No user cursors to render, but test cursor should be visible",
+        );
+        return;
+      }
 
       // Generate different colors for different users
       const colors = [
@@ -88,52 +146,68 @@ const RichTextEditor = forwardRef(
       Object.values(userCursors).forEach((cursor, index) => {
         if (cursor.range && cursor.range.index !== undefined) {
           try {
+            console.log(
+              `Rendering cursor for user ${cursor.userId} at position ${cursor.range.index}`,
+            );
             const bounds = editor.getBounds(
               cursor.range.index,
               cursor.range.length || 0,
             );
-            if (bounds) {
+
+            if (bounds && bounds.height > 0) {
               const color = colors[index % colors.length];
               const cursorElement = document.createElement("div");
               cursorElement.className = "collaborative-cursor";
               cursorElement.setAttribute("data-user-id", cursor.userId);
 
-              // Position cursors correctly relative to the document
+              // Get the toolbar height to offset cursor position
+              const toolbar = containerRef.querySelector(".ql-toolbar");
+              const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
+
+              // Position cursors correctly relative to the container
               cursorElement.style.cssText = `
                 position: absolute;
-                top: ${bounds.top}px;
+                top: ${bounds.top + toolbarHeight}px;
                 left: ${bounds.left}px;
-                width: 2px;
-                height: ${bounds.height}px;
+                width: 3px;
+                height: ${Math.max(bounds.height, 18)}px;
                 background-color: ${color};
                 pointer-events: none;
                 z-index: 1001;
-                animation: blink 1s infinite;
+                border-radius: 1px;
+                box-shadow: 0 0 2px rgba(0,0,0,0.3);
               `;
 
               // Add user label
               const label = document.createElement("div");
-              label.textContent = `User ${cursor.userId.slice(-4)}`;
+              label.textContent = `${cursor.userId.slice(-4)}`;
               label.style.cssText = `
                 position: absolute;
-                top: -20px;
-                left: 0;
+                top: -22px;
+                left: -2px;
                 background: ${color};
                 color: white;
                 padding: 2px 6px;
                 border-radius: 3px;
-                font-size: 12px;
+                font-size: 11px;
+                font-weight: 500;
                 white-space: nowrap;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                z-index: 1002;
               `;
               cursorElement.appendChild(label);
 
-              // Append to the editor's editing area (ql-editor) instead of container
-              const editorElement = editor.root;
-              if (editorElement) {
-                editorElement.appendChild(cursorElement);
-              } else {
-                editor.container.appendChild(cursorElement);
-              }
+              // Add blinking animation
+              cursorElement.style.animation = "cursorBlink 1.2s infinite";
+
+              // Append to the cursor overlay
+              cursorOverlay.appendChild(cursorElement);
+
+              console.log(
+                `Cursor rendered at top: ${
+                  bounds.top + toolbarHeight
+                }px, left: ${bounds.left}px`,
+              );
             }
           } catch (e) {
             console.warn("Could not render cursor for user:", cursor.userId, e);
@@ -149,25 +223,36 @@ const RichTextEditor = forwardRef(
 
       const handleScroll = () => {
         // Re-render cursors when scrolling
-        const cursorsToUpdate = editor.root.querySelectorAll(
+        const containerRef = quillRef.current?.container;
+        if (!containerRef) return;
+
+        const cursorOverlay = containerRef.querySelector(".cursor-overlay");
+        if (!cursorOverlay) return;
+
+        const cursorsToUpdate = cursorOverlay.querySelectorAll(
           ".collaborative-cursor",
         );
         cursorsToUpdate.forEach((cursorElement) => {
           const userId = cursorElement.getAttribute("data-user-id");
           const cursor = userCursors[userId];
-          if (cursor && cursor.range) {
+          if (cursor && cursor.range && cursor.range.index !== undefined) {
             try {
               const bounds = editor.getBounds(
                 cursor.range.index,
                 cursor.range.length || 0,
               );
-              if (bounds) {
-                cursorElement.style.top = `${bounds.top}px`;
+              if (bounds && bounds.height > 0) {
+                const toolbar = containerRef.querySelector(".ql-toolbar");
+                const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
+                cursorElement.style.top = `${bounds.top + toolbarHeight}px`;
                 cursorElement.style.left = `${bounds.left}px`;
-                cursorElement.style.height = `${bounds.height}px`;
+                cursorElement.style.height = `${Math.max(bounds.height, 18)}px`;
               }
             } catch (e) {
-              // Ignore errors for invalid ranges
+              console.warn(
+                `Error updating cursor position for user ${userId}:`,
+                e,
+              );
             }
           }
         });

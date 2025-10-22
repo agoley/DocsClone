@@ -965,21 +965,52 @@ textarea {
   }
 }
 
+@keyframes cursorBlink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .collaborative-cursor {
   position: absolute;
   pointer-events: none;
-  z-index: 10;
+  z-index: 1001;
   max-height: 100vh;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .collaborative-cursor div {
   font-family: "Google Sans", sans-serif;
   font-size: 11px;
   font-weight: 500;
+  pointer-events: none;
 }
 
 /* Ensure cursors stay within the editor area */
+.ql-editor {
+  position: relative;
+}
+
 .ql-editor .collaborative-cursor {
   position: absolute;
+}
+
+/* Improve cursor visibility */
+.collaborative-cursor::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -1px;
+  width: 5px;
+  height: 4px;
+  background: inherit;
+  border-radius: 2px 2px 0 0;
 }
