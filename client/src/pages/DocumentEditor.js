@@ -21,6 +21,7 @@ const DocumentEditor = () => {
   const [toast, setToast] = useState({ show: false, message: "" });
 
   const saveTimeoutRef = useRef(null);
+  const cursorTimeoutRef = useRef(null);
   const lastSavedContent = useRef({ title: "", content: "" });
   const lastRemoteUpdate = useRef(0);
   const ignoreNextUpdate = useRef(false);
@@ -282,12 +283,18 @@ const DocumentEditor = () => {
   const handleSelectionChange = useCallback(
     (range) => {
       if (range && !isUpdatingFromRemote.current) {
-        // Send cursor position to other users via WebSocket
-        wsService.sendCursorUpdate(id, {
-          userId: wsService.getClientId(), // We'll need to implement this
-          range: range,
-          timestamp: Date.now(),
-        });
+        // Debounce cursor updates to reduce network traffic but keep them fast
+        if (cursorTimeoutRef.current) {
+          clearTimeout(cursorTimeoutRef.current);
+        }
+
+        cursorTimeoutRef.current = setTimeout(() => {
+          wsService.sendCursorUpdate(id, {
+            userId: wsService.getClientId(),
+            range: range,
+            timestamp: Date.now(),
+          });
+        }, 100); // Very fast debounce - 100ms
       }
     },
     [id],

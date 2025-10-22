@@ -59,11 +59,15 @@ const RichTextEditor = forwardRef(
       const editor = quillRef.current?.getEditor();
       if (!editor) return;
 
-      // Clear existing cursor overlays only from this editor's container
+      // Clear existing cursor overlays from both container and root
       const existingCursors = editor.container.querySelectorAll(
         ".collaborative-cursor",
       );
       existingCursors.forEach((cursor) => cursor.remove());
+
+      // Also clear from the editor root
+      const rootCursors = editor.root.querySelectorAll(".collaborative-cursor");
+      rootCursors.forEach((cursor) => cursor.remove());
 
       // Generate different colors for different users
       const colors = [
@@ -89,6 +93,8 @@ const RichTextEditor = forwardRef(
               const cursorElement = document.createElement("div");
               cursorElement.className = "collaborative-cursor";
               cursorElement.setAttribute("data-user-id", cursor.userId);
+
+              // Position cursors correctly relative to the document
               cursorElement.style.cssText = `
                 position: absolute;
                 top: ${bounds.top}px;
@@ -97,7 +103,7 @@ const RichTextEditor = forwardRef(
                 height: ${bounds.height}px;
                 background-color: ${color};
                 pointer-events: none;
-                z-index: 1000;
+                z-index: 1001;
                 animation: blink 1s infinite;
               `;
 
@@ -117,7 +123,13 @@ const RichTextEditor = forwardRef(
               `;
               cursorElement.appendChild(label);
 
-              editor.container.appendChild(cursorElement);
+              // Append to the editor's editing area (ql-editor) instead of container
+              const editorElement = editor.root;
+              if (editorElement) {
+                editorElement.appendChild(cursorElement);
+              } else {
+                editor.container.appendChild(cursorElement);
+              }
             }
           } catch (e) {
             console.warn("Could not render cursor for user:", cursor.userId, e);
@@ -125,6 +137,46 @@ const RichTextEditor = forwardRef(
         }
       });
     }, [userCursors]);
+
+    // Update cursor positions on scroll
+    useEffect(() => {
+      const editor = quillRef.current?.getEditor();
+      if (!editor) return;
+
+      const handleScroll = () => {
+        // Re-render cursors when scrolling
+        const cursorsToUpdate = editor.root.querySelectorAll(
+          ".collaborative-cursor",
+        );
+        cursorsToUpdate.forEach((cursorElement) => {
+          const userId = cursorElement.getAttribute("data-user-id");
+          const cursor = userCursors[userId];
+          if (cursor && cursor.range) {
+            try {
+              const bounds = editor.getBounds(
+                cursor.range.index,
+                cursor.range.length || 0,
+              );
+              if (bounds) {
+                cursorElement.style.top = `${bounds.top}px`;
+                cursorElement.style.left = `${bounds.left}px`;
+                cursorElement.style.height = `${bounds.height}px`;
+              }
+            } catch (e) {
+              // Ignore errors for invalid ranges
+            }
+          }
+        });
+      };
+
+      const scrollContainer = editor.scrollingContainer || editor.container;
+      scrollContainer.addEventListener("scroll", handleScroll);
+
+      return () => {
+        scrollContainer.removeEventListener("scroll", handleScroll);
+      };
+    }, [userCursors]);
+
     // Custom toolbar configuration
     const modules = useMemo(
       () => ({
@@ -168,27 +220,11 @@ const RichTextEditor = forwardRef(
 
     const handleChange = useCallback(
       (content, delta, source, editor) => {
-        // Trigger onChange for user changes and certain programmatic changes
-        // We want to capture image insertions and other content changes
+        // Always trigger onChange for user changes (including image insertions)
         if (source === "user") {
           onChange(content);
-        } else if (source === "api" && delta && delta.ops) {
-          // Check if this API change includes image insertions or other content changes
-          const hasContentChange = delta.ops.some(
-            (op) =>
-              op.insert &&
-              (typeof op.insert === "object" || // Images and embeds
-                (typeof op.insert === "string" && op.insert.trim().length > 0)), // Non-empty text
-          );
-          if (hasContentChange) {
-            console.log(
-              "Detected content change from API (likely image or rich content):",
-              delta,
-            );
-            // Don't call onChange here as it would create a loop with remote updates
-            // The content will be updated through the value prop
-          }
         }
+        // Don't trigger onChange for API changes to avoid loops with remote updates
       },
       [onChange],
     );
