@@ -7,12 +7,15 @@ class WebSocketService {
       "document-joined": [],
       "user-joined": [],
       "user-left": [],
+      "cursor-update": [],
+      "user-disconnected": [],
       error: [],
     };
     this.currentDocumentId = null;
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
     this.reconnectTimeout = null;
+    this.clientId = this.generateClientId();
   }
 
   connect() {
@@ -128,6 +131,24 @@ class WebSocketService {
       title,
       content,
     });
+  }
+
+  sendCursorUpdate(documentId, cursorData) {
+    this.sendMessage({
+      type: "cursor-update",
+      documentId: documentId.toString(),
+      ...cursorData,
+    });
+  }
+
+  getClientId() {
+    return this.clientId;
+  }
+
+  generateClientId() {
+    return (
+      "client_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now()
+    );
   }
 
   sendMessage(data) {

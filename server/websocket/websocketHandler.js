@@ -28,6 +28,10 @@ const setupWebSocket = (wss) => {
             documentId = null;
             break;
 
+          case "cursor-update":
+            handleCursorUpdate(ws, data, activeConnections);
+            break;
+
           default:
             console.warn("Unknown WebSocket message type:", data.type);
         }
@@ -182,6 +186,31 @@ const handleLeaveDocument = (ws, data, activeConnections) => {
       `User left document ${documentId}. Remaining users: ${connections.size}`,
     );
   }
+};
+
+// Handle cursor position updates
+const handleCursorUpdate = (ws, data, activeConnections) => {
+  const { documentId, userId, range, timestamp } = data;
+
+  // Validate data
+  if (!documentId || !userId || !range) {
+    ws.send(
+      JSON.stringify({
+        type: "error", 
+        message: "Invalid cursor update data"
+      })
+    );
+    return;
+  }
+
+  // Broadcast cursor position to other users in the document
+  broadcastToDocument(documentId, activeConnections, ws, {
+    type: "cursor-update",
+    documentId,
+    userId,
+    range,
+    timestamp: timestamp || Date.now()
+  });
 };
 
 // Helper to broadcast to all clients for a document except the sender

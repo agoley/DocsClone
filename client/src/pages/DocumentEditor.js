@@ -15,6 +15,7 @@ const DocumentEditor = () => {
   const [error, setError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [activeUsers, setActiveUsers] = useState(1);
+  const [userCursors, setUserCursors] = useState({});
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
   const [toast, setToast] = useState({ show: false, message: "" });
@@ -38,10 +39,10 @@ const DocumentEditor = () => {
       setDocument(data);
       setTitle(data.title);
       setContent(data.content);
-      lastSavedContent.current = { 
-        title: data.title, 
-        content: data.content, 
-        timestamp: Date.now() 
+      lastSavedContent.current = {
+        title: data.title,
+        content: data.content,
+        timestamp: Date.now(),
       };
     } catch (err) {
       console.error("Error fetching document:", err);
@@ -77,37 +78,42 @@ const DocumentEditor = () => {
     const documentUpdatedHandler = (data) => {
       if (data.document.id.toString() === id.toString()) {
         const now = Date.now();
-        
+
         // If we just sent an update, ignore the echo
         if (ignoreNextUpdate.current) {
           ignoreNextUpdate.current = false;
           return;
         }
-        
+
         // Only update if this is a newer change than what we have
         if (now - lastRemoteUpdate.current < 2000) {
           // Recent remote update, be more cautious
-          console.log("Recent remote update detected, checking if we should apply changes");
+          console.log(
+            "Recent remote update detected, checking if we should apply changes",
+          );
         }
-        
+
         lastRemoteUpdate.current = now;
-        
+
         // Update title if different
         if (data.document.title !== title) {
           setTitle(data.document.title);
         }
-        
+
         // Only update content if it's actually different and not from recent local changes
-        if (data.document.content !== content && data.document.content !== lastSavedContent.current.content) {
+        if (
+          data.document.content !== content &&
+          data.document.content !== lastSavedContent.current.content
+        ) {
           isUpdatingFromRemote.current = true;
-          
+
           // Use the editor ref to update content without triggering onChange
           if (editorRef.current && editorRef.current.updateContent) {
             editorRef.current.updateContent(data.document.content);
           }
-          
+
           setContent(data.document.content);
-          
+
           // Reset the flag after state update
           setTimeout(() => {
             isUpdatingFromRemote.current = false;
@@ -117,7 +123,7 @@ const DocumentEditor = () => {
             content: data.document.content,
             timestamp: now,
           };
-          
+
           setToast({ show: true, message: "Document updated by another user" });
           setTimeout(() => {
             setToast({ show: false, message: "" });
@@ -149,6 +155,33 @@ const DocumentEditor = () => {
       }, 3000);
     };
 
+    const cursorUpdateHandler = (data) => {
+      if (
+        data.documentId.toString() === id.toString() &&
+        data.userId !== wsService.getClientId()
+      ) {
+        setUserCursors((prev) => ({
+          ...prev,
+          [data.userId]: {
+            range: data.range,
+            timestamp: data.timestamp,
+            userId: data.userId,
+          },
+        }));
+      }
+    };
+
+    const userDisconnectedHandler = (data) => {
+      if (data.documentId.toString() === id.toString()) {
+        setUserCursors((prev) => {
+          const newCursors = { ...prev };
+          delete newCursors[data.userId];
+          return newCursors;
+        });
+        setActiveUsers(data.activeUsers);
+      }
+    };
+
     // Register event listeners
     const unsubscribeDocumentUpdated = wsService.on(
       "document-updated",
@@ -164,6 +197,14 @@ const DocumentEditor = () => {
     );
     const unsubscribeUserLeft = wsService.on("user-left", userLeftHandler);
     const unsubscribeError = wsService.on("error", errorHandler);
+    const unsubscribeCursorUpdate = wsService.on(
+      "cursor-update",
+      cursorUpdateHandler,
+    );
+    const unsubscribeUserDisconnected = wsService.on(
+      "user-disconnected",
+      userDisconnectedHandler,
+    );
 
     return () => {
       // Clean up event listeners and leave document
@@ -172,6 +213,8 @@ const DocumentEditor = () => {
       unsubscribeUserJoined();
       unsubscribeUserLeft();
       unsubscribeError();
+      unsubscribeCursorUpdate();
+      unsubscribeUserDisconnected();
 
       wsService.leaveDocument(id);
     };
@@ -197,7 +240,7 @@ const DocumentEditor = () => {
       if (!isUpdatingFromRemote.current) {
         saveDocument();
       }
-    }, 2000); // Save after 2 seconds of inactivity
+    }, 800); // Save after 800ms of inactivity for faster collaboration
 
     return () => {
       if (saveTimeoutRef.current) {
@@ -211,10 +254,23 @@ const DocumentEditor = () => {
     if (isUpdatingFromRemote.current) {
       return;
     }
-    
+
     setContent(newContent);
   }, []);
 
+  const handleSelectionChange = useCallback(
+    (range) => {
+      if (range && !isUpdatingFromRemote.current) {
+        // Send cursor position to other users via WebSocket
+        wsService.sendCursorUpdate(id, {
+          userId: wsService.getClientId(), // We'll need to implement this
+          range: range,
+          timestamp: Date.now(),
+        });
+      }
+    },
+    [id],
+  );
   const saveDocument = async () => {
     if (
       isSaving ||
@@ -227,17 +283,17 @@ const DocumentEditor = () => {
     try {
       setIsSaving(true);
       const now = Date.now();
-      
+
       await documentsApi.updateDocument(id, { title, content });
-      lastSavedContent.current = { 
-        title, 
-        content, 
-        timestamp: now 
+      lastSavedContent.current = {
+        title,
+        content,
+        timestamp: now,
       };
 
       // Mark that we're sending an update to ignore the echo
       ignoreNextUpdate.current = true;
-      
+
       // Update through WebSocket for real-time collaboration
       wsService.updateDocument(id, title, content);
     } catch (err) {
@@ -393,6 +449,8 @@ const DocumentEditor = () => {
             ref={editorRef}
             value={content}
             onChange={handleContentChange}
+            onSelectionChange={handleSelectionChange}
+            userCursors={userCursors}
             placeholder="Start typing your document..."
           />
         </div>
