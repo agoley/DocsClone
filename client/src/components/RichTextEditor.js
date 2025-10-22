@@ -56,12 +56,10 @@ const RichTextEditor = forwardRef(
 
     // Handle cursor updates from other users
     useEffect(() => {
-      console.log("RichTextEditor userCursors updated:", userCursors);
-      console.log("Number of cursors:", Object.keys(userCursors).length);
       const editor = quillRef.current?.getEditor();
       if (!editor) return;
 
-      // Clear existing cursor elements (simple approach that was working)
+      // Clear existing cursor elements
       const existingCursors = editor.root.querySelectorAll(
         ".collaborative-cursor",
       );
@@ -86,61 +84,73 @@ const RichTextEditor = forwardRef(
 
       // Add cursor overlays for other users
       Object.values(userCursors).forEach((cursor, index) => {
-        if (cursor.range && cursor.range.index !== undefined) {
+        if (cursor.range && typeof cursor.range.index === "number") {
           try {
+            // Ensure the cursor position is within document bounds
+            const documentLength = editor.getLength();
+            const safeIndex = Math.min(cursor.range.index, documentLength - 1);
+
             const bounds = editor.getBounds(
-              cursor.range.index,
+              safeIndex,
               cursor.range.length || 0,
             );
 
-            if (bounds && bounds.height > 0) {
+            if (
+              bounds &&
+              typeof bounds.top === "number" &&
+              typeof bounds.left === "number"
+            ) {
               const color = colors[index % colors.length];
               const cursorElement = document.createElement("div");
               cursorElement.className = "collaborative-cursor";
               cursorElement.setAttribute("data-user-id", cursor.userId);
 
-              // Position cursors correctly relative to the editor
-              cursorElement.style.cssText = `
-                position: absolute;
-                top: ${bounds.top}px;
-                left: ${bounds.left}px;
-                width: 3px;
-                height: ${Math.max(bounds.height, 18)}px;
-                background-color: ${color};
-                pointer-events: none;
-                z-index: 1001;
-                border-radius: 1px;
-                box-shadow: 0 0 2px rgba(0,0,0,0.3);
-              `;
+              // Create cursor with more reliable positioning
+              const cursorHeight = Math.max(bounds.height || 18, 18);
+
+              cursorElement.style.position = "absolute";
+              cursorElement.style.top = `${bounds.top}px`;
+              cursorElement.style.left = `${bounds.left}px`;
+              cursorElement.style.width = "3px";
+              cursorElement.style.height = `${cursorHeight}px`;
+              cursorElement.style.backgroundColor = color;
+              cursorElement.style.pointerEvents = "none";
+              cursorElement.style.zIndex = "1001";
+              cursorElement.style.borderRadius = "1px";
+              cursorElement.style.boxShadow = "0 0 2px rgba(0,0,0,0.3)";
 
               // Add user label
               const label = document.createElement("div");
-              label.textContent = `${cursor.userId.slice(-4)}`;
-              label.style.cssText = `
-                position: absolute;
-                top: -22px;
-                left: -2px;
-                background: ${color};
-                color: white;
-                padding: 2px 6px;
-                border-radius: 3px;
-                font-size: 11px;
-                font-weight: 500;
-                white-space: nowrap;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                z-index: 1002;
-              `;
+              label.textContent = cursor.userId.slice(-4);
+              label.style.position = "absolute";
+              label.style.top = "-20px";
+              label.style.left = "-2px";
+              label.style.background = color;
+              label.style.color = "white";
+              label.style.padding = "2px 4px";
+              label.style.borderRadius = "2px";
+              label.style.fontSize = "10px";
+              label.style.fontWeight = "500";
+              label.style.whiteSpace = "nowrap";
+              label.style.zIndex = "1002";
+
               cursorElement.appendChild(label);
 
               // Add blinking animation
               cursorElement.style.animation = "cursorBlink 1.2s infinite";
 
-              // Append to the editor root with relative positioning
-              editor.root.style.position = "relative";
+              // Ensure editor has relative positioning and append cursor
+              if (
+                !editor.root.style.position ||
+                editor.root.style.position === "static"
+              ) {
+                editor.root.style.position = "relative";
+              }
+
               editor.root.appendChild(cursorElement);
             }
-          } catch (e) {
-            console.warn("Could not render cursor for user:", cursor.userId, e);
+          } catch (error) {
+            console.warn("Error rendering cursor:", error);
           }
         }
       });

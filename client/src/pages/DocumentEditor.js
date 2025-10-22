@@ -167,27 +167,18 @@ const DocumentEditor = () => {
     };
 
     const cursorUpdateHandler = (data) => {
-      console.log("Received cursor update:", data);
-      console.log("Current document ID:", id);
-      console.log("Current client ID:", wsService.getClientId());
-
       if (
         data.documentId.toString() === id.toString() &&
         data.userId !== wsService.getClientId()
       ) {
-        console.log("Processing cursor update for user:", data.userId);
-        setUserCursors((prev) => {
-          const newCursors = {
-            ...prev,
-            [data.userId]: {
-              range: data.range,
-              timestamp: data.timestamp,
-              userId: data.userId,
-            },
-          };
-          console.log("Updated cursors:", newCursors);
-          return newCursors;
-        });
+        setUserCursors((prev) => ({
+          ...prev,
+          [data.userId]: {
+            range: data.range,
+            timestamp: data.timestamp,
+            userId: data.userId,
+          },
+        }));
       }
     };
 
@@ -203,7 +194,6 @@ const DocumentEditor = () => {
     };
 
     const cursorRemoveHandler = (data) => {
-      console.log("Received cursor remove:", data);
       if (data.documentId.toString() === id.toString()) {
         setUserCursors((prev) => {
           const newCursors = { ...prev };
